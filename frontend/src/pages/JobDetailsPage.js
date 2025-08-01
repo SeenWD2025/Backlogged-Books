@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getJobStatus, downloadProcessedFile } from '../services/api';
 
@@ -7,43 +7,31 @@ const JobDetailsPage = () => {
   const [job, setJob] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pollingInterval, setPollingInterval] = useState(null);
 
-  useEffect(() => {
-    fetchJobStatus();
-
-    // Set up polling if the job is processing
-    if (!pollingInterval && job && job.status === 'PROCESSING') {
-      const interval = setInterval(fetchJobStatus, 3000);
-      setPollingInterval(interval);
-    }
-
-    // Clear polling if job is no longer processing
-    if (pollingInterval && job && job.status !== 'PROCESSING') {
-      clearInterval(pollingInterval);
-      setPollingInterval(null);
-    }
-
-    // Clean up polling on component unmount
-    return () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-      }
-    };
-  }, [jobId, job?.status]);
-
-  const fetchJobStatus = async () => {
+  const fetchJobStatus = useCallback(async () => {
+    // No need to set isLoading(true) here if it's only called from useEffect
+    // which already handles it. But if called from elsewhere, it might be needed.
+    // For now, let's keep it for robustness.
     setIsLoading(true);
     setError(null);
     try {
       const jobData = await getJobStatus(jobId);
       setJob(jobData);
-    } catch (error) {
-      setError(error.message || 'Failed to fetch job status');
+    } catch (err) {
+      setError(err.message || 'Failed to fetch job status');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [jobId]);
+
+  useEffect(() => {
+    fetchJobStatus(); // Initial fetch
+
+    if (job?.status === 'PROCESSING') {
+      const interval = setInterval(fetchJobStatus, 3000);
+      return () => clearInterval(interval); // Cleanup on re-render or unmount
+    }
+  }, [jobId, fetchJobStatus, job?.status]);
 
   const handleDownload = async () => {
     try {

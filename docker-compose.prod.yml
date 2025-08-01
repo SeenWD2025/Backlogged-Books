@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    volumes:
+      - ./afsp_app/uploads:/app/afsp_app/uploads
+      - ./afsp_app/downloads:/app/afsp_app/downloads
+    environment:
+      - PYTHONUNBUFFERED=1
+    # No ports are exposed directly from the backend in production.
+    # Nginx will handle external traffic.
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "8080:80" # Expose Nginx on port 8080
+    depends_on:
+      - backend

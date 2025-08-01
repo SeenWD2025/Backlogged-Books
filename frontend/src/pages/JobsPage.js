@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllJobs } from '../services/api';
 
@@ -10,11 +10,7 @@ const JobsPage = () => {
   const [totalJobs, setTotalJobs] = useState(0);
   const jobsPerPage = 10;
 
-  useEffect(() => {
-    fetchJobs();
-  }, [currentPage]);
-
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -30,7 +26,11 @@ const JobsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, totalJobs]);
+
+  useEffect(() => {
+    fetchJobs();
+  }, [fetchJobs]);
 
   const handlePreviousPage = () => {
     if (currentPage > 0) {

@@ -4,6 +4,7 @@ Application-wide configurations for the Automated Financial Statement Processor 
 
 import os
 from pathlib import Path
+from typing import List
 
 # Base directories
 BASE_DIR = Path(__file__).parent.parent.absolute()
@@ -36,3 +37,9 @@ ALLOWED_EXTENSIONS = {
 API_TITLE = "Automated Financial Statement Processor"
 API_DESCRIPTION = "Convert bank statements and receipts to QuickBooks-compatible CSV formats"
 API_VERSION = "1.0.0"
+
+# CORS settings
+ALLOWED_ORIGINS: List[str] = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+]

@@ -42,3 +42,7 @@ ENV/
 uploads/
 downloads/
 temp/
+
+# Node
+frontend/node_modules/
+*.bak

@@ -4,21 +4,14 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import errorTracker from './services/errorTracker';
+import axe from '@axe-core/react';
 
 // Initialize error tracking
 errorTracker.init();
 
 // Initialize accessibility testing in development
 if (process.env.NODE_ENV !== 'production') {
-  // Check if axe-core is available (it would be installed as a dev dependency)
-  import('@axe-core/react')
-    .then(axe => {
-      axe.default(React, ReactDOM, 1000);
-      console.log('Accessibility testing enabled');
-    })
-    .catch(err => {
-      console.log('Accessibility testing not available: run npm install --save-dev @axe-core/react');
-    });
+  axe(React, ReactDOM, 1000);
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

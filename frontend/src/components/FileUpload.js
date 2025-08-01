@@ -88,10 +88,6 @@ const FileUpload = () => {
     }
   };
 
-  const triggerFileSelect = () => {
-    fileInputRef.current.click();
-  };
-
   const removeFile = () => {
     setFile(null);
     if (fileInputRef.current) {
