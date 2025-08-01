@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+python-dateutil
+pytesseract
+opencv-python
+PyPDF2
+python-docx
+python-multipart
+python-dotenv
+numpy
+pandas
+SQLite-Utils
+pillow
+werkzeug
+python-magic
