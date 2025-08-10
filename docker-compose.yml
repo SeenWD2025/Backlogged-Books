@@ -10,6 +10,7 @@ services:
       - ./afsp_app/uploads:/app/afsp_app/uploads
       - ./afsp_app/downloads:/app/afsp_app/downloads
       - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./afsp_app/afsp.db:/app/afsp_app/afsp.db
     environment:
       - PYTHONUNBUFFERED=1
   frontend:

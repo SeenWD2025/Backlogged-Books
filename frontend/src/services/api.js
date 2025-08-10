@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://localhost';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -8,6 +8,36 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Request interceptor to add auth token to all requests
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor to handle token expiration
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid - clear it and redirect to login
+      localStorage.removeItem('authToken');
+      // Only redirect if we're not already on login/register pages
+      if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const uploadFile = async (file, csvFormat = '3-column', dateFormat = 'MM/DD/YYYY') => {
   const formData = new FormData();
@@ -80,5 +110,75 @@ const handleApiError = (error) => {
       message: error.message || 'An error occurred while setting up the request',
       data: null,
     };
+  }
+};
+
+// Authentication API functions
+export const loginUser = async (email, password) => {
+  try {
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+
+    const response = await apiClient.post('/auth/jwt/login', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const registerUser = async (email, password) => {
+  try {
+    const response = await apiClient.post('/auth/register', {
+      email,
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const response = await apiClient.get('/users/me');
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const verifyUserEmail = async (token) => {
+  try {
+    const response = await apiClient.post('/auth/verify', {
+      token,
+    });
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const resendVerificationEmail = async (email) => {
+  try {
+    const response = await apiClient.post('/auth/request-verify-token', {
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const logoutUser = async () => {
+  try {
+    const response = await apiClient.post('/auth/jwt/logout');
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
   }
 };

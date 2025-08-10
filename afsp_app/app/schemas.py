@@ -7,6 +7,7 @@ from datetime import datetime, date
 from typing import Dict, List, Optional, Tuple, Literal, Any
 from pydantic import BaseModel, Field
 import uuid
+from fastapi_users import schemas
 
 
 class RawTransactionData(BaseModel):
@@ -114,3 +115,13 @@ class QuickBooksFormatRequest(BaseModel):
     """
     csv_format: Literal["3-column", "4-column"] = "3-column"
     date_format: Literal["MM/DD/YYYY", "DD/MM/YYYY"] = "MM/DD/YYYY"
+
+
+class UserRead(schemas.BaseUser[uuid.UUID]):
+    pass
+
+class UserCreate(schemas.BaseUserCreate):
+    pass
+
+class UserUpdate(schemas.BaseUserUpdate):
+    pass

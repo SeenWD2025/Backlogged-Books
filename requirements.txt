@@ -14,3 +14,8 @@ SQLite-Utils
 pillow
 werkzeug
 python-magic
+
+fastapi-users[sqlalchemy]
+passlib[bcrypt]
+pydantic-settings
+aiosqlite
